@@ -1,6 +1,6 @@
 # YourCarYourWay Chat PoC
 
-<img src="./chat-backend\src\main\resources\static\16672296983742_P12_banner.png" alt="Your Car Your Way logo" />
+<img src="./backend\src\main\resources\static\16672296983742_P12_banner.png" alt="Your Car Your Way logo" />
 
 ## Contexte
 
