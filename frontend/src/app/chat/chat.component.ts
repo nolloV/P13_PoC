@@ -1,37 +1,62 @@
-// chat.component.ts
 import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { WebsocketService } from '../services/websocket.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { WebsocketService } from '../services/websocket.service';
 
 @Component({
-  selector: 'app-chat', // Sélecteur du composant
-  standalone: true, // Indique que le composant est autonome
-  templateUrl: './chat.component.html', // Chemin vers le template HTML du composant
-  styleUrls: ['./chat.component.scss'], // Chemin vers les styles CSS du composant
-  imports: [CommonModule, FormsModule] // Modules importés pour le composant
+  selector: 'app-chat',
+  standalone: true,
+  templateUrl: './chat.component.html',
+  styleUrls: ['./chat.component.scss'],
+  imports: [CommonModule, FormsModule, HttpClientModule]
 })
 export class ChatComponent implements OnInit {
-  user: string = ''; // Nom de l'utilisateur
-  message: string = ''; // Contenu du message
-  messages: { user: string, content: string }[] = []; // Liste des messages
+  userId: number | null = null;
+  role: string | null = null;
+  message: string = '';
+  messages: { utilisateur_id: number, prenom: string, content: string, expediteur: string }[] = [];
 
-  // Injection du service WebsocketService
-  constructor(private websocketService: WebsocketService) { }
+  constructor(private httpClient: HttpClient, private websocketService: WebsocketService) {}
 
-  // Méthode appelée lors de l'initialisation du composant
   ngOnInit(): void {
-    // S'abonner aux nouveaux messages
-    this.websocketService.getMessages().subscribe((msg: { user: string, content: string }) => {
-      this.messages.push(msg); // Ajouter le message à la liste des messages
+    // Abonnement aux messages WebSocket dès l'initialisation du composant
+    this.websocketService.getMessages().subscribe((msg: any) => {
+      console.log("Message reçu :", msg);
+      this.messages.push(msg);
     });
   }
 
-  // Méthode pour envoyer un message
+  startChat() {
+    if (this.role) {
+      this.loadMessages();
+    }
+  }
+
+  loadMessages() {
+    // Charge les messages historiques en fonction du rôle
+    if (this.role === 'utilisateur' && this.userId) {
+      this.httpClient.get(`/api/chat/messages/${this.userId}`)
+        .subscribe((messages: any) => {
+          this.messages = messages;
+        });
+    } else if (this.role === 'service_client') {
+      this.httpClient.get(`/api/chat/messages/service-client`)
+        .subscribe((messages: any) => {
+          this.messages = messages;
+        });
+    }
+  }
+
   sendMessage() {
-    if (this.user && this.message) { // Vérifie que l'utilisateur et le message ne sont pas vides
-      this.websocketService.sendMessage({ user: this.user, content: this.message }); // Envoie le message via le service WebSocket
-      this.message = ''; // Réinitialise le champ de saisie du message
+    if (this.message) {
+      const messageData = {
+        utilisateur_id: this.userId,  // Envoi de utilisateur_id directement
+        content: this.message,
+        expediteur: this.role === 'service_client' ? 'SERVICE_CLIENT' : 'UTILISATEUR'
+      };
+      this.websocketService.sendMessage(messageData);
+      this.message = '';
     }
   }
 }

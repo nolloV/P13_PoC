@@ -4,60 +4,55 @@ import SockJS from 'sockjs-client';
 import { Observable, Subject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root' // Indique que le service est fourni à la racine de l'application
+  providedIn: 'root'
 })
 export class WebsocketService {
-  private client: Client; // Client STOMP pour gérer les connexions WebSocket
-  private messages: Subject<{ user: string, content: string }>; // Sujet pour émettre les messages reçus
+  private client: Client;
+  private messages: Subject<{ utilisateur_id: number, content: string }>;
 
   constructor() {
-    // Initialisation du client STOMP
     this.client = new Client({
-      brokerURL: 'ws://localhost:8080/chat', // URL du broker WebSocket
+      brokerURL: 'ws://localhost:8080/chat',
       connectHeaders: {
         login: 'guest',
         passcode: 'guest'
       },
       debug: (str) => {
-        console.log(str); // Fonction de débogage pour afficher les messages de débogage
+        console.log(str);
       },
-      reconnectDelay: 5000, // Délai de reconnexion en millisecondes
-      heartbeatIncoming: 4000, // Intervalle de heartbeat entrant en millisecondes
-      heartbeatOutgoing: 4000, // Intervalle de heartbeat sortant en millisecondes
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
       webSocketFactory: () => {
-        return new SockJS('http://localhost:8080/chat'); // Fabrique de WebSocket utilisant SockJS
+        return new SockJS('http://localhost:8080/chat');
       }
     });
 
-    // Gestion de la connexion réussie
     this.client.onConnect = (frame) => {
-      console.log('Connected: ' + frame); // Affiche un message de connexion réussie
-      // S'abonne au topic des messages
+      console.log('Connected: ' + frame);
       this.client.subscribe('/topic/messages', (message: Message) => {
-        this.messages.next(JSON.parse(message.body)); // Émet le message reçu
+        this.messages.next(JSON.parse(message.body));
       });
     };
 
-    // Gestion des erreurs STOMP
     this.client.onStompError = (frame) => {
-      console.error('Broker reported error: ' + frame.headers['message']); // Affiche l'erreur signalée par le broker
-      console.error('Additional details: ' + frame.body); // Affiche les détails supplémentaires de l'erreur
+      console.error('Broker reported error: ' + frame.headers['message']);
+      console.error('Additional details: ' + frame.body);
     };
 
-    this.client.activate(); // Active le client STOMP
-    this.messages = new Subject<{ user: string, content: string }>(); // Initialise le sujet des messages
+    this.client.activate();
+    this.messages = new Subject<{ utilisateur_id: number, content: string }>();
   }
 
-  // Méthode pour envoyer un message
-  sendMessage(message: { user: string, content: string }) {
+  // Mise à jour pour accepter utilisateur_id
+  sendMessage(message: { utilisateur_id: number | null, content: string }) {
     this.client.publish({
-      destination: '/app/message', // Destination du message
-      body: JSON.stringify(message) // Corps du message en format JSON
+      destination: '/app/message',
+      body: JSON.stringify(message)
     });
   }
 
-  // Méthode pour obtenir les messages en tant qu'Observable
-  getMessages(): Observable<{ user: string, content: string }> {
-    return this.messages.asObservable(); // Retourne les messages en tant qu'Observable
+  getMessages(): Observable<{ utilisateur_id: number, content: string }> {
+    return this.messages.asObservable();
   }
 }

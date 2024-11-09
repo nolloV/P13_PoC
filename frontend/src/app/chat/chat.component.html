@@ -1,20 +1,28 @@
-<!-- chat.component.html -->
-<div class="container">
-  <div class="input-group">
-    <label for="user">Utilisateur:</label>
-    <input id="user" [(ngModel)]="user" placeholder="Entrez votre nom">
-  </div>
-  <div class="input-group">
+<div *ngIf="!role">
+  <label>Choisissez votre rôle :</label>
+  <select [(ngModel)]="role">
+    <option value="utilisateur">Utilisateur</option>
+    <option value="service_client">Service Client</option>
+  </select>
+  <input *ngIf="role === 'utilisateur'" type="number" [(ngModel)]="userId" placeholder="ID de l'utilisateur">
+  <button (click)="startChat()">Commencer le Chat</button>
+</div>
+
+<div *ngIf="role">
+  <div>
     <label for="message">Message:</label>
     <input id="message" [(ngModel)]="message" placeholder="Entrez votre message">
-  </div>
-  <div class="button-group">
     <button (click)="sendMessage()">Envoyer</button>
   </div>
+
   <div class="messages">
     <h2>Messages:</h2>
     <ul>
-      <li *ngFor="let msg of messages">{{msg.user}}: {{msg.content}}</li>
+      <li *ngFor="let msg of messages">
+        <strong *ngIf="msg.expediteur === 'SERVICE_CLIENT'">Service Client:</strong>
+        <strong *ngIf="msg.expediteur === 'UTILISATEUR'">{{ msg.prenom }}:</strong>
+        {{ msg.content }}
+      </li>
     </ul>
   </div>
 </div>

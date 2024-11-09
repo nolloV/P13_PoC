@@ -1,40 +1,86 @@
 package com.example.chat_backend.model;
 
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
 public class ChatMessage {
 
-    // Contenu du message
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String content;
-    
-    // Utilisateur qui a envoyé le message
-    private String user;
+
+    @Enumerated(EnumType.STRING)
+    private Expéditeur expediteur;
+
+    @Column(name = "utilisateur_id")
+    private Long utilisateurId; // Utilisation de utilisateurId pour faire référence à l'utilisateur
+
+    private LocalDateTime timestamp;
+
+    public enum Expéditeur {
+        UTILISATEUR,
+        SERVICE_CLIENT
+    }
 
     // Constructeur par défaut
-    public ChatMessage() {
-    }
+    public ChatMessage() {}
 
-    // Constructeur avec paramètres pour initialiser le contenu et l'utilisateur
-    public ChatMessage(String content, String user) {
+    // Constructeur avec paramètres
+    public ChatMessage(String content, Expéditeur expediteur, Long utilisateurId) {
         this.content = content;
-        this.user = user;
+        this.expediteur = expediteur;
+        this.utilisateurId = utilisateurId;
+        this.timestamp = LocalDateTime.now();
     }
 
-    // Getter pour le contenu du message
+    // Getters et setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getContent() {
         return content;
     }
 
-    // Setter pour le contenu du message
     public void setContent(String content) {
         this.content = content;
     }
 
-    // Getter pour l'utilisateur
-    public String getUser() {
-        return user;
+    public Expéditeur getExpediteur() {
+        return expediteur;
     }
 
-    // Setter pour l'utilisateur
-    public void setUser(String user) {
-        this.user = user;
+    public void setExpediteur(Expéditeur expediteur) {
+        this.expediteur = expediteur;
+    }
+
+    public Long getUtilisateurId() {
+        return utilisateurId;
+    }
+
+    public void setUtilisateurId(Long utilisateurId) {
+        this.utilisateurId = utilisateurId;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
     }
 }

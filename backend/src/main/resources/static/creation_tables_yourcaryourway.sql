@@ -67,3 +67,13 @@ CREATE TABLE Paiement (
     statutRemboursement ENUM('en_attente', 'remboursé', 'non_remboursable'),
     FOREIGN KEY (reservation_id) REFERENCES Reservation(id) ON DELETE SET NULL
 );
+
+-- Table Message
+CREATE TABLE Message (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    contenu TEXT,
+    expediteur ENUM('UTILISATEUR', 'SERVICE_CLIENT'),
+    utilisateur_id INT,
+    dateEnvoi TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (utilisateur_id) REFERENCES Utilisateur(id) ON DELETE CASCADE
+);
