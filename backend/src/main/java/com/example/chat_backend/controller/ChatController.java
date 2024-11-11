@@ -1,20 +1,15 @@
 package com.example.chat_backend.controller;
 
-import java.util.List;
-
+import com.example.chat_backend.DTO.ChatMessageDTO;
+import com.example.chat_backend.model.ChatMessage;
+import com.example.chat_backend.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.example.chat_backend.model.ChatMessage;
-import com.example.chat_backend.service.ChatService;
+import java.util.List;
 
-@Controller
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
@@ -24,19 +19,18 @@ public class ChatController {
 
     @MessageMapping("/message")
     @SendTo("/topic/messages")
-    public ChatMessage sendMessage(ChatMessage message) {
-        // Sauvegarde du message sans chercher l'objet Utilisateur
+    public ChatMessageDTO sendMessage(ChatMessageDTO message) {
         chatService.addMessage(message);
         return message;
     }
 
     @GetMapping("/messages/{userId}")
-    public List<ChatMessage> getUserMessages(@PathVariable Long userId) {
+    public List<ChatMessageDTO> getUserMessages(@PathVariable Long userId) {
         return chatService.getMessagesByUser(userId);
     }
 
     @GetMapping("/messages/service-client")
-    public List<ChatMessage> getServiceClientMessages() {
+    public List<ChatMessageDTO> getServiceClientMessages() {
         return chatService.getMessagesByRole(ChatMessage.Expéditeur.SERVICE_CLIENT);
     }
 }
