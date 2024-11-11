@@ -34,7 +34,13 @@ cd YourCarYourWay-ChatPoC
    cd chat-backend
    ./mvnw clean install
    ```
-2. **Lancer le serveur backend**
+2. **Déployer le script de la base de données**
+   Assurez-vous d'avoir MySQL installé et en cours d'exécution. Ensuite, exécutez le script SQL pour créer les tables nécessaires :
+   ```bash
+   mysql -u root -p < backend/src/main/resources/static/creation_tables_yourcaryourway.sql
+   ```
+
+3. **Lancer le serveur backend**
 ```bash
 ./mvnw spring-boot:run
 ```
