@@ -10,40 +10,45 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-@Entity
+@Entity // Indique que cette classe est une entité JPA, mappée sur une table dans la base de données
 public class ChatMessage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Génération automatique de l'ID
+    private Long id; // Identifiant unique du message
 
-    private String content;
+    private String content; // Contenu du message
 
-    @Enumerated(EnumType.STRING)
-    private Expéditeur expediteur;
+    @Enumerated(EnumType.STRING) // Stockage de l'enum sous forme de chaîne de caractères dans la base de données
+    private Expéditeur expediteur; // Rôle de l'expéditeur (utilisateur ou service client)
 
-    @Column(name = "utilisateur_id")
-    private Long utilisateurId; // Utilisation de utilisateurId pour faire référence à l'utilisateur
+    @Column(name = "utilisateur_id") // Nom de la colonne correspondant dans la base de données
+    private Long utilisateurId; // ID de l'utilisateur qui a envoyé le message
 
-    private LocalDateTime timestamp;
+    @Column(nullable = false) // Assure que le champ timestamp ne soit jamais null
+    private LocalDateTime timestamp; // Date et heure de l'envoi du message
 
+    // Enumération pour définir les types d'expéditeurs
     public enum Expéditeur {
-        UTILISATEUR,
-        SERVICE_CLIENT
+        UTILISATEUR, // Expéditeur est un utilisateur
+        SERVICE_CLIENT // Expéditeur est le service client
     }
 
     // Constructeur par défaut
-    public ChatMessage() {}
+    public ChatMessage() {
+        this.timestamp = LocalDateTime.now(); // Initialise le timestamp avec la date et l'heure actuelles
+    }
 
     // Constructeur avec paramètres
     public ChatMessage(String content, Expéditeur expediteur, Long utilisateurId) {
-        this.content = content;
-        this.expediteur = expediteur;
-        this.utilisateurId = utilisateurId;
-        this.timestamp = LocalDateTime.now();
+        this.content = content; // Initialise le contenu du message
+        this.expediteur = expediteur; // Initialise l'expéditeur
+        this.utilisateurId = utilisateurId; // Associe l'ID de l'utilisateur
+        this.timestamp = LocalDateTime.now(); // Initialise le timestamp avec la date et l'heure actuelles
     }
 
-    // Getters et setters
+    // Getters et setters pour chaque champ
+
     public Long getId() {
         return id;
     }

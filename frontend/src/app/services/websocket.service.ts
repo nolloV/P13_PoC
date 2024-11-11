@@ -45,7 +45,7 @@ export class WebsocketService {
   }
 
   // Mise à jour pour accepter utilisateur_id
-  sendMessage(message: { utilisateur_id: number | null, content: string }) {
+  sendMessage(message: { utilisateurId: number | null, content: string }) {
     this.client.publish({
       destination: '/app/message',
       body: JSON.stringify(message)
